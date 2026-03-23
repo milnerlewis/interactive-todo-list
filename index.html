@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Interactive To-Do List</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <main class="app">
+            <h1>Interactive To-Do List</h1>
+
+            <form id="task-form" class="task-form">
+                <label for="task-input" class="sr-only">Task</label>
+                <input id="task-input" type="text" placeholder="Add a new task..." required />
+                <select id="task-priority" aria-label="Select task priority">
+                    <option value="high">High</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="low">Low</option>
+                </select>
+                <button type="submit">Add</button>
+            </form>
+
+            <section class="filters" aria-label="Task filters">
+                <button class="filter-btn active" data-filter="all" type="button">All | <span id="count-all">0</span></button>
+                <button class="filter-btn" data-filter="active" type="button">Active | <span id="count-active">0</span></button>
+                <button class="filter-btn" data-filter="completed" type="button">Completed | <span id="count-completed">0</span></button>
+            </section>
+
+            <ul id="task-list" class="task-list" aria-live="polite"></ul>
+            <p id="empty-state" class="empty-state">No tasks yet. Add your first one!</p>
+        </main>
+
+        <script src="script.js"></script>
+    </body>
+</html>
