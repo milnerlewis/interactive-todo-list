@@ -12,12 +12,13 @@
 
             <form id="task-form" class="task-form">
                 <label for="task-input" class="sr-only">Task</label>
-                <input id="task-input" type="text" placeholder="Add a new task..." required />
+                <input id="task-input" type="text" placeholder="Add a new task..." required/>
                 <select id="task-priority" aria-label="Select task priority">
                     <option value="high">High</option>
                     <option value="medium" selected>Medium</option>
                     <option value="low">Low</option>
                 </select>
+                <input type="date" id="task-due-date" aria-label="Select due date"/>
                 <button type="submit">Add</button>
             </form>
 

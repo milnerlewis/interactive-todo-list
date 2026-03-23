@@ -198,3 +198,19 @@ button:active {
     border-color: #9bb8ff;
     box-shadow: 0 0 0 2px rgba(111, 153, 255, 0.2);
 }
+
+.task-meta {
+    font-size: 0.7rem;
+    color: #686c76;
+    display: block;
+}
+
+.task-due {
+    font-size: 0.7rem;
+    display: block;
+}
+
+.task-due.overdue {
+    color: #e01e37;
+    font-weight: 600;
+}

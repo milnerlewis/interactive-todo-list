@@ -12,6 +12,7 @@ const priorityOrder = {high: 0, medium: 1, low: 2};
 const prioritySequence = ["high", "medium", "low"];
 const prioritySelect = document.getElementById("task-priority");
 const LAST_CLICKED_KEY = "interactive-todo-list.lastClickedTaskId";
+const taskDueDate = document.getElementById("task-due-date");
 
 let tasks = loadTasks();
 let currentFilter = "all";
@@ -25,10 +26,21 @@ function setLastClickedTask(id) {
 
 function loadTasks() {
     try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : [];
-    } catch (error) {
-        console.error("Failed to load tasks from localStorage", error);
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) return [];
+        const parsed = JSON.parse(stored);
+        if (!Array.isArray(parsed)) throw new Error("Invalid tasks data");
+        return parsed.map((task) => ({
+            id: task.id,
+            title: task.title,
+            completed: task.completed,
+            priority: task.priority || "medium",
+            createdAt: task.createdAt || new Date().toISOString(),
+            dueDate: task.dueDate || null,
+        }));
+    } catch (e) {
+        console.error("Failed to load tasks:", e);
+        localStorage.removeItem(STORAGE_KEY);
         return [];
     }
 }
@@ -37,12 +49,14 @@ function saveTasks() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 
-function addTask(title, priority) {
+function addTask(title, priority, dueDate) {
     tasks.push({
         id: Date.now().toString(),
         title,
         completed: false,
         priority: priority || "medium",
+        createdAt: new Date().toISOString(),
+        dueDate: dueDate || null,
     });
 
     saveTasks();
@@ -154,6 +168,16 @@ function prioritySorting(tasks) {
     return sorted;
 }
 
+function formatDate(isoString) {
+    const date = new Date(isoString);
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function isOverdue(dueDate) {
+    if (!dueDate) return false;
+    return new Date(dueDate) < new Date() && !tasks.find(t => t.dueDate === dueDate && t.completed);
+}
+
 function renderTasks() {
     const filteredTasks = prioritySorting(getFilteredTasks());
     taskList.innerHTML = "";
@@ -169,7 +193,12 @@ function renderTasks() {
             <div class="task-left">
                 <input type="checkbox" data-action="toggle" data-id="${task.id}" ${task.completed ? "checked" : ""} />
                 <span class="task-priority ${task.priority}" data-action="cycle-priority" data-id="${task.id}">${task.priority}</span>
-                <span class="task-title" data-action="edit-title" data-id="${task.id}">${task.title}</span>            </div>
+                <span class="task-title" data-action="edit-title" data-id="${task.id}">${task.title}</span>            
+            </div>
+            <div class="task-meta">
+                <span class="task-created">Created: ${new Date(task.createdAt).toLocaleDateString()}</span>
+                ${task.dueDate ? `<span class="task-due">Due: ${new Date(task.dueDate).toLocaleDateString()}</span>` : ""}
+            </div>
             <div class="task-actions">
                 <button type="button" data-action="delete" data-id="${task.id}">Delete</button>
             </div>
@@ -191,7 +220,7 @@ taskForm.addEventListener("submit", (event) => {
         return;
     }
 
-    addTask(title, priority);
+    addTask(title, priority, taskDueDate.value || null);
     taskInput.value = "";
     taskInput.focus();
 });
