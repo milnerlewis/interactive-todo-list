@@ -11,17 +11,19 @@ const filterButtons = document.querySelectorAll(".filter-btn");
 const priorityOrder = {high: 0, medium: 1, low: 2};
 const prioritySequence = ["high", "medium", "low"];
 const prioritySelect = document.getElementById("task-priority");
-const LAST_CLICKED_KEY = "interactive-todo-list.lastClickedTaskId";
+const lastClickedKey = "interactive-todo-list.lastClickedTaskId";
 const taskDueDate = document.getElementById("task-due-date");
+const advancedToggle = document.getElementById("advanced-toggle");
+const advancedFilters = document.getElementById("advanced-filters");
 
 let tasks = loadTasks();
 let currentFilter = "all";
-let lastClickedTaskId = localStorage.getItem(LAST_CLICKED_KEY);
+let lastClickedTaskId = localStorage.getItem(lastClickedKey);
 
 function setLastClickedTask(id) {
     lastClickedTaskId = id;
-    if (id) localStorage.setItem(LAST_CLICKED_KEY, id);
-    else localStorage.removeItem(LAST_CLICKED_KEY);
+    if (id) localStorage.setItem(lastClickedKey, id);
+    else localStorage.removeItem(lastClickedKey);
 }
 
 function loadTasks() {
@@ -97,6 +99,23 @@ function updateCounters() {
     countCompleted.textContent = completed.toString();
 }
 
+function isToday(dateString) {
+    const today = new Date().toDateString();
+    return new Date(dateString).toDateString() === today;
+}
+
+function isUpcoming(dateString) {
+    const today = new Date();
+    const sevenDaysAhead = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const dueDate = new Date(dateString);
+    return dueDate > today && dueDate <= sevenDaysAhead;
+}
+
+function isOverdue(dueDate) {
+    if (!dueDate) return false;
+    return new Date(dueDate) < new Date();
+}
+
 function getFilteredTasks() {
     if (currentFilter === "active") {
         return tasks.filter((task) => !task.completed);
@@ -104,6 +123,18 @@ function getFilteredTasks() {
 
     if (currentFilter === "completed") {
         return tasks.filter((task) => task.completed);
+    }
+
+    if (currentFilter === "overdue") {
+        return tasks.filter((task) => !task.completed && task.dueDate && isOverdue(task.dueDate));
+    }
+
+    if (currentFilter === "today") {
+        return tasks.filter((task) => !task.completed && task.dueDate && isToday(task.dueDate));
+    }
+
+    if (currentFilter === "upcoming") {
+        return tasks.filter((task) => !task.completed && task.dueDate && isUpcoming(task.dueDate));
     }
 
     return tasks;
@@ -275,6 +306,17 @@ taskList.addEventListener("change", (event) => {
         toggleTask(id);
     }
 });
+
+advancedToggle.addEventListener("click", () => {
+    advancedFilters.classList.toggle("hidden");
+});
+
+advancedFilters.classList.add("hidden");
+
+advancedToggle.classList.toggle("active",
+                                currentFilter !== "all" &&
+                                currentFilter !== "active" &&
+                                currentFilter !== "completed");
 
 filterButtons.forEach((button) => {
     button.addEventListener("click", () => {
