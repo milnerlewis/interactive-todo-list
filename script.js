@@ -11,9 +11,17 @@ const filterButtons = document.querySelectorAll(".filter-btn");
 const priorityOrder = {high: 0, medium: 1, low: 2};
 const prioritySequence = ["high", "medium", "low"];
 const prioritySelect = document.getElementById("task-priority");
+const LAST_CLICKED_KEY = "interactive-todo-list.lastClickedTaskId";
 
 let tasks = loadTasks();
 let currentFilter = "all";
+let lastClickedTaskId = localStorage.getItem(LAST_CLICKED_KEY);
+
+function setLastClickedTask(id) {
+    lastClickedTaskId = id;
+    if (id) localStorage.setItem(LAST_CLICKED_KEY, id);
+    else localStorage.removeItem(LAST_CLICKED_KEY);
+}
 
 function loadTasks() {
     try {
@@ -42,7 +50,9 @@ function addTask(title, priority) {
 }
 
 function deleteTask(id) {
-    tasks = tasks.filter((task) => task.id !== id);
+    if (lastClickedTaskId === id) {
+        setLastClickedTask(null);
+    }
     saveTasks();
     renderTasks();
 }
@@ -149,15 +159,17 @@ function renderTasks() {
     taskList.innerHTML = "";
 
     filteredTasks.forEach((task) => {
+        const isLastClicked = lastClickedTaskId === task.id;
         const li = document.createElement("li");
-        li.className = `task-item${task.completed ? " completed" : ""}`;
+        li.className = `task-item${task.completed ? " completed" : ""}${isLastClicked ? " last-clicked" : ""}`;
+        li.dataset.taskId = task.id;
+
 
         li.innerHTML = `
             <div class="task-left">
                 <input type="checkbox" data-action="toggle" data-id="${task.id}" ${task.completed ? "checked" : ""} />
-                <span class="task-priority ${task.priority}" data-action="edit-title" data-id="${task.id}">${task.priority}</span>
-                <span class="task-title" data-action="edit-title" data-id="${task.id}">${task.title}</span>
-            </div>
+                <span class="task-priority ${task.priority}" data-action="cycle-priority" data-id="${task.id}">${task.priority}</span>
+                <span class="task-title" data-action="edit-title" data-id="${task.id}">${task.title}</span>            </div>
             <div class="task-actions">
                 <button type="button" data-action="delete" data-id="${task.id}">Delete</button>
             </div>
@@ -197,6 +209,14 @@ taskList.addEventListener("click", (event) => {
         return;
     }
 
+    const taskItem = target.closest(".task-item");
+    if (taskItem instanceof HTMLElement && taskItem.dataset.taskId) {
+        setLastClickedTask(taskItem.dataset.taskId);
+        taskList.querySelectorAll(".task-item.last-clicked").forEach((item) => {
+            item.classList.remove("last-clicked");
+        });
+    }
+
     if (action === "delete") {
         deleteTask(id);
     }
@@ -222,6 +242,7 @@ taskList.addEventListener("change", (event) => {
     const id = target.dataset.id;
 
     if (action === "toggle" && id) {
+        setLastClickedTask(id);
         toggleTask(id);
     }
 });

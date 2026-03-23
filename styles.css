@@ -193,3 +193,8 @@ button:active {
     border-radius: 6px;
     min-width: 160px;
 }
+
+.task-item.last-clicked {
+    border-color: #9bb8ff;
+    box-shadow: 0 0 0 2px rgba(111, 153, 255, 0.2);
+}
