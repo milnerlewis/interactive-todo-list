@@ -209,6 +209,23 @@ function isOverdue(dueDate) {
     return new Date(dueDate) < new Date() && !tasks.find(t => t.dueDate === dueDate && t.completed);
 }
 
+function getEmptyStateMessage() {
+    switch (currentFilter) {
+        case "active":
+            return "No active tasks. Great job!";
+        case "completed":
+            return "No completed tasks yet.";
+        case "overdue":
+            return "No overdue tasks!";
+        case "today":
+            return "No tasks for today.";
+        case "upcoming":
+            return "No upcoming tasks.";
+        default:
+            return "No tasks yet. Add your first one!";
+    }
+}
+
 function renderTasks() {
     const filteredTasks = prioritySorting(getFilteredTasks());
     taskList.innerHTML = "";
@@ -238,7 +255,12 @@ function renderTasks() {
         taskList.appendChild(li);
     });
 
-    emptyState.style.display = filteredTasks.length === 0 ? "block" : "none";
+    if (filteredTasks.length === 0) {
+        emptyState.textContent = getEmptyStateMessage();
+        emptyState.style.display = "block";
+    } else {
+        emptyState.style.display = "none";
+    }
     updateCounters();
 }
 
