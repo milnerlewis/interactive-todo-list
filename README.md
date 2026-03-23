@@ -1,5 +1,10 @@
 # Interactive To-Do List
 
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow)
+![CSS](https://img.shields.io/badge/CSS-3.0-blue)
+![HTML](https://img.shields.io/badge/HTML-5-orange)
+
+
 A small program I built using HTML, CSS, and JavaScript to develop my knowledge of `localstorage` and data filtering
 
 ## What it does
