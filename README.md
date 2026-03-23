@@ -1,6 +1,6 @@
 # Interactive To-Do List
 
-A task manager I built using HTML, CSS, and JavaScript to develop my knowledge of 
+A small program I built using HTML, CSS, and JavaScript to develop my knowledge of `localstorage` and data filtering
 
 ## What it does
 
