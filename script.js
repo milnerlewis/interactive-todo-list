@@ -93,10 +93,16 @@ function updateCounters() {
     const all = tasks.length;
     const active = tasks.filter((task) => !task.completed).length;
     const completed = all - active;
+    const overdue = tasks.filter((task) => !task.completed && task.dueDate && isOverdue(task.dueDate)).length;
+    const today = tasks.filter((task) => !task.completed && task.dueDate && isToday(task.dueDate)).length;
+    const upcoming = tasks.filter((task) => !task.completed && task.dueDate && isUpcoming(task.dueDate)).length;
 
     countAll.textContent = all.toString();
     countActive.textContent = active.toString();
     countCompleted.textContent = completed.toString();
+    document.getElementById("count-overdue").textContent = overdue.toString() - today.toString();
+    document.getElementById("count-today").textContent = today.toString();
+    document.getElementById("count-upcoming").textContent = upcoming.toString();
 }
 
 function isToday(dateString) {
@@ -126,7 +132,7 @@ function getFilteredTasks() {
     }
 
     if (currentFilter === "overdue") {
-        return tasks.filter((task) => !task.completed && task.dueDate && isOverdue(task.dueDate));
+        return tasks.filter((task) => !task.completed && task.dueDate && isOverdue(task.dueDate) && !isToday(task.dueDate));
     }
 
     if (currentFilter === "today") {
